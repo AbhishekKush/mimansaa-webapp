@@ -56,7 +56,14 @@ export const store = new Vuex.Store({
                     commit('setUser', null);
                     commit('setIsAuthenticated', false);
                 });
-        }
+        },
+        signOut: function() {
+            Firebase.auth()
+              .signOut()
+              .then(() => {
+                this.$router.replace('sign-in');
+              });
+          }
 	}
 
 })
