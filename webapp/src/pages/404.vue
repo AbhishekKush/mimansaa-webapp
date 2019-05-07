@@ -38,29 +38,4 @@
 </template>
 
 <script>
-import UserRegister from '@/components/register'
-import UserLogin from '@/components/login'
-export default {
-    name: 'Signin',
-    components:{
-        'UserRegister':UserRegister,
-        'UserLogin':UserLogin
-    },
-    data() {
-        return {
-            valid: false,
-            showLogin:true
-        };
-    },
-    methods: {
-        submit() {
-            if (this.$refs.form.validate()) {
-                this.$store.dispatch('userLogin', {
-                    email: this.email,
-                    password: this.password
-                });
-            }
-        }
-    }
-};
 </script>

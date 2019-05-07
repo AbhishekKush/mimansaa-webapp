@@ -19,7 +19,8 @@ export default new Router({
       name: 'auth',
       component: () => import('@/components/auth'),
       meta:{
-        requiresVisitor:true
+        requiresVisitor:true,
+        title: 'Skills - MyApp'
       },
       //props: true ,
        children: [
@@ -28,20 +29,19 @@ export default new Router({
               // when /user/:id/profile is matched
               path: '',
               redirect: { name: 'LoginPage' },
+              
             },
             {
-              // UserProfile will be rendered inside User's <router-view>
-              // when /user/:id/profile is matched
               path: 'login',
               name: 'LoginPage',
+              meta:{
+                title: 'Skills - MyApp'
+              },
               component: () => import('@/components/login')
             },
             {
-              // UserProfile will be rendered inside User's <router-view>
-              // when /user/:id/profile is matched
               path: 'register',
               name: 'RegisterPage',
-              redirect: { name: 'foo' },
               component: () => import('@/components/register')
             },
           ]
@@ -57,8 +57,6 @@ export default new Router({
       //props: true ,
        children: [
             {
-              // UserProfile will be rendered inside User's <router-view>
-              // when /user/:id/profile is matched
               path: '',
               name: 'DashboardPage',
               component: () => import('@/pages/admin/DashboardPage'),

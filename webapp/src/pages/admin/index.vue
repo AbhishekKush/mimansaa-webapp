@@ -65,39 +65,34 @@
       solo-inverted
     ></v-autocomplete>
         <v-spacer></v-spacer>
-        <v-btn icon>
-        <v-icon>apps</v-icon>
+        <v-menu left origin="center center" transition="slide-y-transition">
+        <v-btn icon large slot="activator">
+          <v-avatar size="32px"  tile>
+            <img src="https://cdn.vuetifyjs.com/images/logos/v-alt.svg" alt="Vuetify">
+          </v-avatar>
         </v-btn>
-        <v-btn icon>
-        <v-icon>notifications</v-icon>
-        </v-btn>
-        <v-btn icon large>
-        <v-avatar size="32px" tile>
-            <img src="https://cdn.vuetifyjs.com/images/logos/logo.svg" alt="Vuetify">
-        </v-avatar>
-        </v-btn>
+        <v-list >
+          <v-list-tile ripple v-for="(item, i) in sitems" :key="i">
+            <v-list-tile-title>{{ item.title}}</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile  @click="logout">
+            <v-list-tile-title >Logout</v-list-tile-title>
+          </v-list-tile>
+<!-- 
+          <router-link to="/admin/category">
+            <v-list-tile >
+              <v-list-tile-title>Admin</v-list-tile-title>
+            </v-list-tile>
+          </router-link> -->
+          
+          
+        </v-list>
+      </v-menu>
     </v-toolbar>
     <v-content>
-        <v-container fluid fill-height>
-        <v-layout justify-center align-center>
-            <v-tooltip right>
-            <template v-slot:activator="{ on }">
-                <v-btn :href="source" icon large target="_blank" v-on="on">
-                <v-icon large>code</v-icon>
-                </v-btn>
-            </template>
-            <span>Source</span>
-            </v-tooltip>
-            <v-tooltip right>
-            <template v-slot:activator="{ on }">
-                <v-slide-x-reverse-transition mode="out-in">
-                    <router-view/>
-                </v-slide-x-reverse-transition>
-            </template>
-            <span>Codepen</span>
-            </v-tooltip>
+        <v-layout >
+            <router-view/>
         </v-layout>
-        </v-container>
     </v-content>
     <v-btn fab bottom right color="pink" dark fixed>
         <v-icon>add</v-icon>
@@ -114,6 +109,11 @@
         items: [],
         search: null,
         select: null,
+        sitems: [
+        { title: 'Setting' },
+        { title: 'User' },
+        
+      ],
         menu: [
       { icon: "contacts", text: "Contacts" },
       { icon: "history", text: "Frequently contacted" },
@@ -225,6 +225,9 @@
           })
           this.loading = false
         }, 500)
+      },
+      logout(){
+        this.$store.dispatch('userSignOut')
       }
     }
   }

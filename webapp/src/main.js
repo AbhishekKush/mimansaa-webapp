@@ -8,12 +8,14 @@ import './assets/scss/style.scss'
 import {store} from './store'
 Vue.use(Vuetify)
 import router from './router'
+import firebase from 'firebase'
 import '@/firebase/';
 
 
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
+  store.dispatch('checkLogin');
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
@@ -49,6 +51,13 @@ new Vue({
   store:store,
   el: '#app',
   router,
+  created() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if(!user) {
+        store.dispatch('userSignOut')
+        }
+     });
+    },
   components: { App },
   template: '<App/>'
 })

@@ -33,12 +33,14 @@
 </template>
 
 <script>
+// import firebase from 'firebase';
 export default {
     name: 'Signin',
     data() {
         return {
             valid: false,
             email: '',
+            snackbar:null,
             password: '',
             emailRules: [
                 v => !!v || 'E-mail is required',
@@ -52,12 +54,32 @@ export default {
             ]
         };
     },
+     watch: {
+    // user (auth) {
+    //   if(!!auth){
+    //     this.$router.replace(this.nextRoute)
+    //   }
+    // }
+  },
+  computed:{
+      user(){
+        //   return this.$store.getters.getUser
+      }
+  },
+    mounted(){
+    },
     methods: {
         submit() {
             if (this.$refs.form.validate()) {
                 this.$store.dispatch('userLogin', {
                     email: this.email,
                     password: this.password
+                });
+
+                this.$store.dispatch('showSnackbar', {
+                    snackbar:{
+                        message:"Logging In"
+                    }
                 });
             }
         }
