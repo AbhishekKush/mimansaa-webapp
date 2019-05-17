@@ -10,3 +10,16 @@ var config = {
     messagingSenderId: "143764224870"
   };
   firebase.initializeApp(config);
+  //  export const fb =  db.database()
+
+  // https://medium.freecodecamp.org/how-to-build-a-spa-using-vue-js-vuex-vuetify-and-firebase-adding-authentication-with-firebase-d9932d1e4365
+
+//   methods: {
+//     orderRecipe(item) {
+//         if (this.isAuthenticated) {
+//             this.$store.dispatch('addRecipe', item);
+//         } else {
+//             this.$router.push('/sign-in');
+//         }
+//     }
+// }

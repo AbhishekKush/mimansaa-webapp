@@ -1,10 +1,12 @@
 import firebase from 'firebase';
 import router from '@/router';
+// const  fb  = require( '@/firebase/');
 export default{
     state:{
         user: JSON.parse(localStorage.getItem('user')) || null,
         isAuthenticated: false,
-        
+        loading:false,
+        error:null
     },
     getters: {
         isAuthenticated:state=>{
@@ -12,6 +14,10 @@ export default{
         },
         getUser:state=>{
             return state.user
+        },
+        getAllUser({ state, commit }) {
+            return firebase.database().ref('all_users')
+                
         }
     },
     mutations: {
@@ -22,6 +28,12 @@ export default{
         setIsAuthenticated(state, payload) {
             state.isAuthenticated = payload;
         },
+        setLoading(state,payload){
+            state.loading=payload
+        },
+        setError(state,payload){
+            state.error=payload
+        }
     },
     actions: {
         userLogin({ commit }, { email, password }) {
@@ -36,11 +48,6 @@ export default{
                 .catch(() => {
                     commit('setUser', null);
                     commit('setIsAuthenticated', false);
-
-                    //remove after testing
-                    // commit('setUser', user);
-                    // commit('setIsAuthenticated', true);
-                    // router.push('/dashboard');
                 });
         },
 		userJoin({ commit }, { email, password }) {

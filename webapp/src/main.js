@@ -1,16 +1,25 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+
 import Vue from 'vue'
 import App from './App'
 import Vuetify from 'vuetify'
 import axios from 'axios'
 import './assets/scss/style.scss'
 import {store} from './store'
-Vue.use(Vuetify)
 import router from './router'
 import firebase from 'firebase'
+import * as VueGoogleMaps from "vue2-google-maps";
 import '@/firebase/';
 
+
+Vue.use(Vuetify)
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
+    libraries: "places" // necessary for places input
+  }
+});
 
 Vue.config.productionTip = false
 

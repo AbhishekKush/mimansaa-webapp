@@ -63,6 +63,13 @@ export default new Router({
               meta:{
                 requiresAuth:true
               },
+            },{
+              path: 'AddSchool',
+              name: 'AddSchool',
+              component: () => import('@/pages/admin/school/AddSchool'),
+              meta:{
+                requiresAuth:true
+              },
             }
           ]
     },

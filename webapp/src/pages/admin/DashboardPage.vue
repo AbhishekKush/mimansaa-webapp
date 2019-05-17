@@ -43,6 +43,12 @@ export default {
             reviews: 413,
       value: 4.5
         };
+    },
+    mounted(){
+       console.log(this.$store.getters.getAllUser);
+       ;
+      
+        
     }
 }
 </script>
