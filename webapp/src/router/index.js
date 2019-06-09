@@ -8,6 +8,7 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
+  linkExactActiveClass: 'is-active',
   routes: [
     {
       path: '/',
@@ -63,13 +64,40 @@ export default new Router({
               meta:{
                 requiresAuth:true
               },
-            },{
+            },
+            {
               path: 'AddSchool',
               name: 'AddSchool',
               component: () => import('@/pages/admin/school/AddSchool'),
               meta:{
                 requiresAuth:true
               },
+            },
+            {
+              path: 'AllSchools',
+              name: 'AllSchools',
+              component: () => import('@/pages/admin/school/Schools'),
+              meta:{
+                requiresAuth:true
+              }
+            },
+            {
+              path: 'School/:id',
+              name: 'School',
+              props:true,
+              component: () => import('@/pages/admin/school/Schools'),
+              meta:{
+                requiresAuth:true
+              }
+            },
+            {
+              path: 'EditSchool/:id',
+              name: 'EditSchool',
+              props:true,
+              component: () => import('@/pages/admin/school/EditSchool'),
+              meta:{
+                requiresAuth:true
+              }
             }
           ]
     },

@@ -1,27 +1,31 @@
 <template>
   <v-container grid-list-md text-xs-center>
-    <v-layout row wrap>
+    <v-layout row wrap v-if="loaded">
       <v-flex md8>
-        <h1 class="display-1 font-weight-light">Add New School</h1>
+        <h1 class="display-1 font-weight-light">Edit School</h1>
         <v-card class="pa-4 mt-4">
-          <v-form>
-            <v-text-field v-model="school.name" :rules="nameRules" label="School Name" required></v-text-field>
+          <v-form v-model="valid">
+            <v-text-field
+              v-model="editedSchool.name"
+              :rules="nameRules"
+              label="School Name"
+              required
+            ></v-text-field>
             <v-textarea
-              v-model="school.address"
+              v-model="editedSchool.address"
               :rules="addressRules"
-              name="input-7-1"
               label="Address"
               hint="Type full adress with area pincode"
             ></v-textarea>
-            <v-text-field v-model="school.city" :rules="cityRules" label="City" required></v-text-field>
+            <v-text-field v-model="editedSchool.city" :rules="cityRules" label="City" required></v-text-field>
             <v-text-field
-              v-model="school.phone"
+              v-model="editedSchool.phone"
               :rules="phoneRules"
-              label="School Phone No."
+              label="School phone No."
               required
             ></v-text-field>
             <v-text-field
-              v-model="school.email"
+              v-model="editedSchool.email"
               :rules="emailRules"
               label="School Email ID"
               required
@@ -34,7 +38,7 @@
               <v-flex md3>
                 <v-select
                   :rules="fromHourRules"
-                  v-model="school.openHour"
+                  v-model="editedSchool.openHour"
                   v-bind:items="hours"
                   label="Hour"
                   solo
@@ -43,7 +47,7 @@
               <v-flex md3>
                 <v-select
                   :rules="fromMinuteRules"
-                  v-model="school.openMinute"
+                  v-model="editedSchool.openMinute"
                   v-bind:items="minutes"
                   label="Minute"
                   solo
@@ -52,7 +56,7 @@
               <v-flex md3>
                 <v-select
                   :rules="fromAmPmRules"
-                  v-model="school.openAmPm"
+                  v-model="editedSchool.openAmPm"
                   v-bind:items="['AM','PM']"
                   label="AM/PM"
                   solo
@@ -64,7 +68,7 @@
               <v-flex md3>
                 <v-select
                   v-bind:items="hours"
-                  v-model="school.closeHour"
+                  v-model="editedSchool.closeHour"
                   :rules="toHourRules"
                   label="Hour"
                   solo
@@ -73,7 +77,7 @@
               <v-flex md3>
                 <v-select
                   v-bind:items="minutes"
-                  v-model="school.closeMinute"
+                  v-model="editedSchool.closeMinute"
                   :rules="toMinuteRules"
                   label="Minute"
                   solo
@@ -82,19 +86,38 @@
               <v-flex md3>
                 <v-select
                   :rules="toAmPmRules"
-                  v-model="school.closeAmPm"
+                  v-model="editedSchool.closeAmPm"
                   v-bind:items="['AM','PM']"
                   label="AM/PM"
                   solo
                 ></v-select>
               </v-flex>
             </v-layout>
-
-            <set-map @locationChanged="loctionUpdated"/>
-            <input type="hidden" v-model="school.latitude">
-            <input type="hidden" v-model="school.longitude">
-            <v-btn :loading="loading" color="primary" @click="saveData">
-              Add School
+            <!-- <google-map @locationChanged="loctionUpdated"/> -->
+            <v-btn color="primary" flat="flat" @click="dialog = true">Change Location</v-btn>
+            <v-dialog v-model="dialog" max-width="800px" persistent>
+              <v-card class="pa-4">
+                <v-card-title class="headline">Use Google's location service?</v-card-title>
+                 <v-divider></v-divider>
+                <set-map @locationChanged="loctionUpdated"/>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" flat="flat" @click="dialog = false">Disagree</v-btn>
+                  <v-btn color="primary"  @click="saveChangedLocation()">Save Location</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <view-map :center="{lat:editedSchool.latitude,lng:editedSchool.longitude}"/>
+            <input type="hidden" v-model="editedSchool.latitude">
+            <input type="hidden" v-model="editedSchool.longitude">
+            <v-btn
+              :loading="loading"
+              :disabled="loading || !valid"
+              color="primary"
+              @click="saveEditedSchool"
+            >
+              Update
               <v-icon right dark>save</v-icon>
             </v-btn>
           </v-form>
@@ -110,17 +133,27 @@
 </template>
 
 <script>
-import setMap from "@/components/setMap";
+ import setMap from "@/components/setMap";
+import viewMap from "@/components/viewMap";
 import firebase from "firebase";
+
 export default {
   name: "App",
   components: {
-    setMap
+    setMap,
+    viewMap
   },
+  props: ["id"],
   data() {
     return {
-      school: {
-        name: "Kendriya Vidyalay",
+      valid: false,
+      dialog:false,
+      loaded: false,
+      loading: false,
+      templat:null,
+      templng:null,
+      editedSchool: {
+        name: "",
         address: "",
         city: "",
         phone: "",
@@ -134,8 +167,6 @@ export default {
         closeMinute: null,
         closeAmPm: null
       },
-      valid: false,
-      loading: false,
       place: null,
       hours: [
         "01",
@@ -237,47 +268,77 @@ export default {
       toAmPmRules: [v => !!v || "AM/PM is required"]
     };
   },
-  mounted() {},
-  computed: {},
+  computed: {
+    editedSchoolName: {
+      get: function() {
+        return this.$store.state.school.loadedSchool.name;
+      },
+      set: function(value) {
+        this.$store.commit("editedSchoolName", value);
+      }
+    }
+    // editedSchool(){
+    //   return this.$store.getters.loadedSchool
+    // },
+    // isLoaded() {
+    //   return this.$store.getters.isLoaded;
+    // }
+  },
+  created() {
+    this.loadSchool(this.id);
+    //this.loaded=false
+  },
   methods: {
     loctionUpdated(location) {
-      this.school.latitude = location.lat;
-      this.school.longitude = location.lng;
+      this.templat = location.lat
+      this.templng = location.lng
     },
-    saveData() {
-      var currentTimestamp = Date.now()
-      var SchoolID = "School_" + currentTimestamp;
+    saveChangedLocation(){
+      this.dialog=false
+      this.editedSchool.latitude = this.templat
+      this.editedSchool.longitude = this.templng
+    },
+    saveEditedSchool() {
       this.loading = true;
+      // this.$store.dispatch('setMainLoading', true)
+      firebase
+        .database()
+        .ref("info_school")
+        .child(this.id)
+        .update(this.editedSchool)
+        .then(data => {
+          //  this.editedSchool=data.val()
+          // console.log(data.val())
+          // this.$store.dispatch('setMainLoading', false)
+          this.$store.dispatch("showSnackbar", {
+            snackbar: {
+              message: "Updated Successfully",
+              type: "success"
+            }
+          });
+        });
+      this.loading = false;
+    },
+    loadSchool(id) {
+      this.loaded = false;
       this.$store.dispatch("showSnackbar", {
         snackbar: {
-          message: "Saving Data"
+          message: "Loading Data"
         }
       });
-      const ref = firebase .database().ref("info_school/")
-        ref.child(SchoolID)
-        .set(this.school)
-        .then(data=> {
-            console.log(data)
-                    ref.child(SchoolID).update({ "id": SchoolID, "addedOn": currentTimestamp})
-                    this.$store.dispatch('showSnackbar', {
-                        snackbar: {
-                            message: "Data saved successfully",
-                            type: "success"
-                        }
-                    })
-                    this.loading = false
-                }
-          )
-           .catch((error) => {
-                    console.log(error)
-                    this.$store.dispatch('showSnackbar', {
-                        snackbar: {
-                            message: error,
-                            type: "error"
-                        }
-                    })
-                    this.loading = false
-                })
+      this.$store.dispatch("setMainLoading", true);
+      firebase
+        .database()
+        .ref("info_school/" + id)
+        .once("value")
+        .then(data => {
+          this.editedSchool = data.val();
+          // console.log(data.val())
+          this.$store.dispatch("setMainLoading", false);
+          // console.log(this.loaded )
+          this.loaded = true;
+          // console.log(this.loaded )
+        });
     }
   }
 };
