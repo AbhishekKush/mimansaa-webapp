@@ -98,7 +98,40 @@ export default new Router({
               meta:{
                 requiresAuth:true
               }
+            },
+            {
+              path: 'AllTransporters',
+              name: 'AllTransporters',
+              component: () => import('@/pages/admin/transporter/Transporters'),
+              meta:{
+                requiresAuth:true
+              }
+            },
+            {
+              path: 'AddTransporter',
+              name: 'AddTransporter',
+              component: () => import('@/pages/admin/transporter/AddTransporter'),
+              meta:{
+                requiresAuth:true
+              },
+            },
+            {
+              path: 'AllUsers',
+              name: 'AllUsers',
+              component: () => import('@/pages/admin/users/Users'),
+              meta:{
+                requiresAuth:true
+              }
+            },
+            {
+            path: 'EditUser/:uid',
+            name: 'EditUser',
+            props:true,
+            component: () => import('@/pages/admin/users/EditUser'),
+            meta:{
+              requiresAuth:true
             }
+          }
           ]
     },
     {

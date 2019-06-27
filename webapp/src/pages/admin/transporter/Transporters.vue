@@ -3,13 +3,13 @@
     <v-layout row wrap>
       <v-flex md12>
         <v-card-title>
-          <h2 class="display-1 font-weight-light">All Schools</h2>
-          <v-btn color="primary" dark class="mb-2" :to="{path: '/admin/addSchool'}">ADD SCHOOL</v-btn>
+          <h2 class="display-1 font-weight-light">All Transporters</h2>
+          <v-btn color="primary" dark class="mb-2" :to="{path: '/admin/addTransporter'}">ADD TRANSPORTER</v-btn>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="search"
-            label="Search School"
+            label="Search Transporter"
             single-line
             hide-details
           ></v-text-field>
@@ -20,10 +20,10 @@
           :headers="headers"
           :search="search"
           :loading="loading"
-          :items="schools"
+          :items="transporters"
           :pagination.sync="pagination"
           select-all
-          item-key="id"
+          item-key="uid"
           class="elevation-1"
         >
           <template v-slot:headers="props">
@@ -55,12 +55,12 @@
               </td>
               <td class="text-xs-center subheading">
                 <router-link
-                  :to="{path: '/admin/school/'  + props.item.id }"
+                  :to="{path: '/admin/school/'  + props.item.uid }"
                   tag="a"
                   style="cursor: pointer"
                 >{{ props.item.name }}</router-link>
               </td>
-              <td class="text-xs-center">{{ props.item.city }}</td>
+              <td class="text-xs-center">5</td>
               <td class="text-xs-center">{{ props.item.phone }}</td>
               <td class="justify-center dense px-0">
                 <v-btn
@@ -68,7 +68,7 @@
                   fab
                   small
                   dark
-                  :to="{path: '/admin/EditSchool/'  + props.item.id }"
+                  :to="{path: '/admin/EditSchool/'  + props.item.uid }"
                 >
                   <v-icon>edit</v-icon>
                 </v-btn>
@@ -89,7 +89,7 @@ import firebase from "firebase";
 export default {
   data() {
     return {
-      schools: [],
+      transporters: [],
       pagination: {
         sortBy: "name"
       },
@@ -97,11 +97,11 @@ export default {
       selected: [],
       headers: [
         {
-          text: "School Name",
+          text: "Transporter Name",
           align: "left",
           value: "name"
         },
-        { text: "City", value: "city" },
+        { text: "No. Vehichle", value: "no_vehichle" },
         { text: "Phone No.", value: "phone" },
         { text: "Actions", value: "name", sortable: false }
       ]
@@ -113,7 +113,7 @@ export default {
     }
   },
   created() {
-    this.loadSchools();
+    this.loadTransporters();
   },
   methods: {
     editItem(item) {
@@ -138,7 +138,7 @@ export default {
 
     toggleAll() {
       if (this.selected.length) this.selected = [];
-      else this.selected = this.schools.slice();
+      else this.selected = this.transporters.slice();
     },
     changeSort(column) {
       if (this.pagination.sortBy === column) {
@@ -148,19 +148,18 @@ export default {
         this.pagination.descending = false;
       }
     },
-    loadSchools() {
+    loadTransporters() {
       this.$store.dispatch("setMainLoading", true);
       firebase
         .database()
-        .ref("info_school")
+        .ref("info_transporter")
         .once("value")
         .then(data => {
           const obj = data.val();
           for (let key in obj) {
-            this.schools.push({
-              id: key,
+            this.transporters.push({
+              uid: key,
               name: obj[key].name,
-              city: obj[key].city,
               phone: obj[key].phone
             });
           }

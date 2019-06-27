@@ -74,6 +74,36 @@ export default {
           ]
         },
         {
+          icon: "directions_bus",
+          text: "Transportors",
+          model: true,
+          children: [
+            {
+              text: "All Transporters",
+              path: "/admin/AllTransporters"
+            },
+            {
+              text: "Add Transporter",
+              path: "/admin/AddTransporters"
+            }
+          ]
+        },
+          {
+          icon: "account_circle",
+          text: "Users",
+          model: true,
+          children: [
+            {
+              text: "All Users",
+              path: "/admin/AllUsers"
+            },
+            {
+              text: "Add User",
+              path: "/admin/AddUser"
+            }
+          ]
+        },
+        {
           icon: "settings",
           text: "More",
           model: false,

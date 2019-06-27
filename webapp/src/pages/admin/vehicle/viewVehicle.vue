@@ -2,109 +2,14 @@
   <v-container grid-list-md text-xs-center>
     <v-layout row wrap>
       <v-flex md8>
-        <h1 class="display-1 font-weight-light">Add New School</h1>
+        <h1 class="display-1 font-weight-light">Showing Vehicle</h1>
         <v-card class="pa-4 mt-4">
-          <v-form>
-            <v-text-field v-model="school.name" :rules="nameRules" label="School Name" required></v-text-field>
-            <v-textarea
-              v-model="school.address"
-              :rules="addressRules"
-              name="input-7-1"
-              label="Address"
-              hint="Type full adress with area pincode"
-            ></v-textarea>
-            <v-text-field v-model="school.city" :rules="cityRules" label="City" required></v-text-field>
-            <v-text-field
-              v-model="school.phone"
-              :rules="phoneRules"
-              label="School Phone No."
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="school.email"
-              :rules="emailRules"
-              label="School Email ID"
-              required
-            ></v-text-field>
-            <h3>School Timing</h3>
-            <v-layout row align-center justify-center fill-height mt-4 wrap>
-              <v-flex md3>
-                <label>From:</label>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  :rules="fromHourRules"
-                  v-model="school.openHour"
-                  v-bind:items="hours"
-                  label="Hour"
-                  solo
-                ></v-select>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  :rules="fromMinuteRules"
-                  v-model="school.openMinute"
-
-                  v-bind:items="minutes"
-                  label="Minute"
-                  solo
-                ></v-select>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  :rules="fromAmPmRules"
-                  v-model="school.openAmPm"
-
-                  v-bind:items="['AM','PM']"
-                  label="AM/PM"
-                  solo
-                ></v-select>
-              </v-flex>
-              <v-flex md3>
-                <label>To:</label>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  v-bind:items="hours"
-                  v-model="school.closeHour"
-                  :rules="toHourRules"
-                  label="Hour"
-                  solo
-                ></v-select>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  v-bind:items="minutes"
-                  v-model="school.closeMinute"
-                  :rules="toMinuteRules"
-                  label="Minute"
-                  solo
-                ></v-select>
-              </v-flex>
-              <v-flex md3>
-                <v-select
-                  :rules="toAmPmRules"
-                  v-model="school.closeAmPm"
-                  v-bind:items="['AM','PM']"
-                  label="AM/PM"
-                  solo
-                ></v-select>
-              </v-flex>
-            </v-layout>
-
-            <set-map @locationChanged="loctionUpdated"/>
-            <input type="hidden" v-model="school.latitude">
-            <input type="hidden" v-model="school.longitude">
-            <v-btn :loading="loading" color="primary" @click="saveData">
-              Add School
-              <v-icon right dark>save</v-icon>
-            </v-btn>
-          </v-form>
-        </v-card>
+          
+        </v-card><view-map :center="{lat:editedSchool.latitude,lng:editedSchool.longitude}"/>
       </v-flex>
 
       <v-flex md4>
-        <h1 class="display-1 font-weight-light">Add School</h1>
+        <h1 class="display-1 font-weight-light"></h1>
       </v-flex>
       <div id="map"></div>
     </v-layout>

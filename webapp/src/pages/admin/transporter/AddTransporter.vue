@@ -2,7 +2,7 @@
   <v-container grid-list-md text-xs-center>
     <v-layout row wrap>
       <v-flex md8>
-        <h1 class="display-1 font-weight-light">Add New School</h1>
+        <h1 class="display-1 font-weight-light">Add New Transporter</h1>
         <v-card class="pa-4 mt-4">
           <v-form>
             <v-text-field v-model="school.name" :rules="nameRules" label="School Name" required></v-text-field>
