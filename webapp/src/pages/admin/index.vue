@@ -23,15 +23,18 @@
       ></v-autocomplete>
       <v-spacer></v-spacer>
       <v-menu left origin="center center" transition="slide-y-transition">
-        <v-btn icon large slot="activator">
-          <v-avatar size="32px" tile>
+        <v-btn flat class="inverted" large slot="activator">
+           <span class="subheading">{{  this.$store.state.auth.user.user.email }}</span>
+          <!-- <v-avatar size="32px" tile>
             <img src="https://cdn.vuetifyjs.com/images/logos/v-alt.svg" alt="Vuetify">
-          </v-avatar>
+          </v-avatar> -->
         </v-btn>
         <v-list>
+          
           <v-list-tile ripple v-for="(item, i) in sitems" :key="i">
             <v-list-tile-title>{{ item.title}}</v-list-tile-title>
           </v-list-tile>
+        
           <v-list-tile @click="logout">
             <v-list-tile-title>Logout</v-list-tile-title>
           </v-list-tile>
@@ -145,7 +148,7 @@ export default {
    computed: {
 
     isLoading(){
-      return this.$store.getters.loadingStatus
+      return this.$store.getters.loading
     }
   },
   methods: {

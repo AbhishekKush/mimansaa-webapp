@@ -65,6 +65,7 @@ export default {
         lat: latLng.lat(),
         lng: latLng.lng()
       };
+      console.log( this.reportedCenter)
       this.$emit("locationChanged", this.reportedCenter);
     },
     sync() {
@@ -81,8 +82,11 @@ export default {
       if (place && place.geometry && place.geometry.location) {
         this.center.lat = place.geometry.location.lat();
         this.center.lng = place.geometry.location.lng();
+        // console.log(place.geometry.location.lat())
+        // console.log(place.geometry.location.lng())
         this.reportedCenter.lat = place.geometry.location.lat();
         this.reportedCenter.lng = place.geometry.location.lng();
+        this.$emit("locationChanged", this.reportedCenter)
       }
     }
   }

@@ -9,17 +9,37 @@ import './assets/scss/style.scss'
 import {store} from './store'
 import router from './router'
 import firebase from 'firebase'
-import * as VueGoogleMaps from "vue2-google-maps";
-import '@/firebase/';
-
+import * as VueGoogleMaps from "vue2-google-maps"
+import '@/firebase/'
+import VuetifyDialog from 'vuetify-dialog'
 
 Vue.use(Vuetify)
+
+Vue.use(VuetifyDialog, {
+
+  confirm: {
+    actions: {
+      false: 'No',
+      true: {
+        text: 'Yes',
+        color: 'primary'
+      }
+    },
+    icon: false, // to disable icon just put false
+    width:250
+  },
+  warning: {},
+  error: {},
+  prompt: {}
+})
+
 Vue.use(VueGoogleMaps, {
   load: {
     key: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
     libraries: "places" // necessary for places input
   }
-});
+})
+
 
 Vue.config.productionTip = false
 

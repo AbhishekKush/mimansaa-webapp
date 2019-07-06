@@ -7,7 +7,14 @@
           <v-btn color="primary" dark class="mb-2" @click="addUserDialog = true">ADD USER</v-btn>
           <v-dialog v-model="addUserDialog" persistent max-width="800px">
             <v-card>
-              <v-card-title class="headline headline grey lighten-2">Add New User</v-card-title>
+              <v-card-title class="py-2 title grey lighten-2">
+                <span class>Add New User</span>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="addUserDialog = false">
+                  <v-icon>close</v-icon>
+                </v-btn>
+              </v-card-title>
+
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm6 md6>
@@ -34,8 +41,14 @@
                     </v-btn>
                     <v-dialog v-model="locationDialog" max-width="800px" persistent>
                       <v-card>
-                        <v-card-title class="headline grey lighten-2" primary-title>Set Location</v-card-title>
-                        <set-map class="pa-4" @locationChanged="loctionUpdated"/>
+                        <v-card-title class="py-2 title grey lighten-2">
+                          <span class>Set Location</span>
+                          <v-spacer></v-spacer>
+                          <v-btn icon @click="locationDialog = false">
+                            <v-icon>close</v-icon>
+                          </v-btn>
+                        </v-card-title>
+                        <set-map class="pa-4" @locationChanged="loctionUpdated" />
                         <v-card-actions>
                           <v-spacer></v-spacer>
                           <v-btn
@@ -58,7 +71,7 @@
                       :type="pVisibility ? 'text' : 'password'"
                       :append-icon="pVisibility ? 'visibility' : 'visibility_off'"
                       required
-                      @click:append="toggleVisibility()"
+                      @click:append="pVisibility = !pVisibility;"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 md4>
@@ -74,6 +87,16 @@
                       <v-radio label="Parent" value="parent" color="primary"></v-radio>
                       <v-radio label="Guard" value="guard" color="primary"></v-radio>
                     </v-radio-group>
+                  </v-flex>
+                  <v-flex sm6 v-if="newUser.user_type=='transporter'">
+                    <v-text-field label="Company ID" v-model="extraTranporterField.company_id"></v-text-field>
+                  </v-flex>
+                  <v-flex sm6 v-if="newUser.user_type=='transporter'">
+                    <v-text-field
+                      label="Your referral id"
+                      read-only
+                      v-model="extraTranporterField.referral_code"
+                    ></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -111,9 +134,8 @@
               <th>
                 <v-icon>filter_list</v-icon>
               </th>
-              <th>
-              </th>
-              <th  class="customFilter">
+              <th></th>
+              <th class="customFilter">
                 <div v-if="filters.hasOwnProperty('user_type')">
                   <v-select
                     flat
@@ -127,8 +149,7 @@
                   ></v-select>
                 </div>
               </th>
-              <th>
-              </th>
+              <th></th>
               <th colspan="2">
                 <v-btn color="primary" dark class="mb-2" @click="loadUsers">REFRESH USER</v-btn>
               </th>
@@ -207,13 +228,17 @@ export default {
       templat: null,
       templng: null,
       password: "",
+      extraTranporterField: {
+        company_id: "",
+        referral_code: ""
+      },
       newUser: {
         name: "",
         phone: "",
         phone_verified: true,
         address: "",
-        home_latitude: "",
-        home_longitude: "",
+        home_latitude: 0,
+        home_longitude: 0,
         status_active: true,
         email: "",
         email_verified: true,
@@ -257,36 +282,37 @@ export default {
   created() {
     //console.log(firebase.auth().currentUser);
     this.loadUsers();
+    this.generateRandomStringCode();
   },
   methods: {
     addNewUser() {
       var createUser = firebase.functions().httpsCallable("createWUser");
-      var newUser = this.newUser
+      var newUser = this.newUser;
       createUser({
         email: this.newUser.email,
         password: this.password,
         phone: this.newUser.phone,
         name: this.newUser.name
       })
-        .then(result=> {
-          console.log(result.data.user.uid)
-          var currentTimestamp = Date.now()
-          var uid = result.data.user.uid
+        .then(result => {
+          console.log(result.data.user.uid);
+          var currentTimestamp = Date.now();
+          var uid = result.data.user.uid;
           const ref = firebase.database().ref("all_users/");
           ref
             .child(uid)
             .set(newUser)
             .then(data => {
-              ref.child(uid).update({ uid: uid, addedOn: currentTimestamp })
-              this.addUserDialog=false
-              this.resetAddUserField()
-              this.loadUsers()
+              ref.child(uid).update({ uid: uid, addedOn: currentTimestamp });
+              this.addUserDialog = false;
+              this.resetAddUserField();
+              this.loadUsers();
               this.$store.dispatch("showSnackbar", {
                 snackbar: {
                   message: "User added successfully",
                   type: "success"
                 }
-              })
+              });
             })
             .catch(error => {
               console.log(error);
@@ -298,8 +324,9 @@ export default {
               });
             });
         })
-        .catch(error=> {
-          console.log(error)
+
+        .catch(error => {
+          console.log(error);
           this.$store.dispatch("showSnackbar", {
             snackbar: {
               message: error.message,
@@ -308,8 +335,20 @@ export default {
           });
         });
     },
-    toggleVisibility() {
-      this.pVisibility = !this.pVisibility;
+    generateRandomStringCode(codeLength = 6) {
+      var generatedCode = "";
+      var alphabets = "";
+      var ch = 0,
+        i = 0;
+      for (ch = 65; ch <= 90; ch++) alphabets += String.fromCharCode(ch);
+      for (ch = 0; ch <= 9; ch++) alphabets += ch.toString();
+
+      for (i = 1; i <= codeLength; i++)
+        generatedCode += alphabets.charAt(
+          Math.floor(Math.random() * alphabets.length)
+        );
+
+      console.log(generatedCode.toUpperCase());
     },
     generatePassword() {
       var length = 8;
@@ -340,17 +379,23 @@ export default {
     deleteItem(item) {
       console.log(item.uid);
       const index = this.users.indexOf(item);
-      var isConfirm = confirm("Are you sure you want to delete this user?") &&this.users.splice(index, 1);
-      var node = firebase.database().ref("all_users").child(item.uid)
-      if(isConfirm){
-        node.remove().then(function() {
-          console.log("Remove succeeded.");
-        })
-        .catch(function(error) {
-          console.log("Remove failed: " + error.message);
-        });
+      var isConfirm =
+        confirm("Are you sure you want to delete this user?") &&
+        this.users.splice(index, 1);
+      var node = firebase
+        .database()
+        .ref("all_users")
+        .child(item.uid);
+      if (isConfirm) {
+        node
+          .remove()
+          .then(function() {
+            console.log("Remove succeeded.");
+          })
+          .catch(function(error) {
+            console.log("Remove failed: " + error.message);
+          });
       }
-        
     },
 
     toggleAll() {
@@ -370,18 +415,17 @@ export default {
       return this.users.map(d => d[val]);
     },
 
-    resetAddUserField(){
-      this.newUser.name="",
-      this.newUser.phone="",
-      this.newUser.address="",
-      this.newUser.home_latitude="",
-      this.newUser.home_longitude="",
-      this.newUser.email="",
-      this.newUser.user_type=""
-
+    resetAddUserField() {
+      (this.newUser.name = ""),
+        (this.newUser.phone = ""),
+        (this.newUser.address = ""),
+        (this.newUser.home_latitude = ""),
+        (this.newUser.home_longitude = ""),
+        (this.newUser.email = ""),
+        (this.newUser.user_type = "");
     },
     loadUsers() {
-      this.users= []
+      this.users = [];
       this.$store.dispatch("setMainLoading", true);
       firebase
         .database()
