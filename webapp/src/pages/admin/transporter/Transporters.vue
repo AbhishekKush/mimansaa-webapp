@@ -4,7 +4,6 @@
       <v-flex md12>
         <v-card-title>
           <h2 class="display-1 font-weight-light">All Transporters</h2>
-          <v-btn color="primary" dark class="mb-2" :to="{path: '/admin/addTransporter'}">ADD TRANSPORTER</v-btn>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -55,12 +54,13 @@
               </td>
               <td class="text-xs-center subheading">
                 <router-link
-                  :to="{path: '/admin/school/'  + props.item.uid }"
+                  :to="{path: '/admin/transporter/'  + props.item.uid }"
                   tag="a"
                   style="cursor: pointer"
                 >{{ props.item.name }}</router-link>
               </td>
-              <td class="text-xs-center">5</td>
+              <td class="text-xs-center">{{ props.item.no_vehicle }}</td>
+              <td class="text-xs-center">{{ props.item.no_child }}</td>
               <td class="text-xs-center">{{ props.item.phone }}</td>
               <td class="justify-center dense px-0">
                 <v-btn
@@ -68,7 +68,7 @@
                   fab
                   small
                   dark
-                  :to="{path: '/admin/EditSchool/'  + props.item.uid }"
+                  :to="{path: '/admin/EditTransporter/'  + props.item.uid }"
                 >
                   <v-icon>edit</v-icon>
                 </v-btn>
@@ -90,6 +90,7 @@ export default {
   data() {
     return {
       transporters: [],
+
       pagination: {
         sortBy: "name"
       },
@@ -101,7 +102,8 @@ export default {
           align: "left",
           value: "name"
         },
-        { text: "No. Vehichle", value: "no_vehichle" },
+        { text: "No. Vehicle", value: "no_vehicle" },
+        { text: "No. Child", value: "no_child" },
         { text: "Phone No.", value: "phone" },
         { text: "Actions", value: "name", sortable: false }
       ]
@@ -123,11 +125,16 @@ export default {
     },
 
     deleteItem(item) {
-      console.log( item.id)
-      const index = this.schools.indexOf(item);
-      confirm("Are you sure you want to delete this item?") && this.schools.splice(index, 1);
-      var node = firebase.database().ref("info_school").child(item.id)
-      node.remove()
+      console.log(item.id);
+      const index = this.transporters.indexOf(item);
+      confirm("Are you sure you want to delete this item?") &&
+        this.transporters.splice(index, 1);
+      var node = firebase
+        .database()
+        .ref("info_school")
+        .child(item.id);
+      node
+        .remove()
         .then(function() {
           console.log("Remove succeeded.");
         })
@@ -149,21 +156,57 @@ export default {
       }
     },
     loadTransporters() {
+      this.transporters = [];
       this.$store.dispatch("setMainLoading", true);
       firebase
         .database()
-        .ref("info_transporter")
+        .ref("all_users/")
+        .orderByChild("user_type")
+        .equalTo("transporter")
         .once("value")
-        .then(data => {
-          const obj = data.val();
+        .then(snapshot => {
+          const obj = snapshot.val();
+          var index = 0;
           for (let key in obj) {
             this.transporters.push({
               uid: key,
               name: obj[key].name,
+              no_vehicle: 0,
+              no_child: 0,
               phone: obj[key].phone
             });
+            this.countVehicle(key, index);
+            this.countChild(key, index);
+            index++;
           }
           this.$store.dispatch("setMainLoading", false);
+        });
+    },
+    countVehicle(transporterUid, index) {
+      firebase
+        .database()
+		.ref("transporter_vehicle/")
+		.child(transporterUid)
+        .once("value", transporterVehicle => {
+          const vehicleObj = transporterVehicle.val();
+          for (let vKey in vehicleObj) {
+              this.transporters[index].no_vehicle = transporterVehicle.numChildren();
+          }
+        });
+    },
+    countChild(transporterUid, index) {
+    let  count = 0 
+      firebase
+        .database()
+        .ref("info_vehicle/")
+        .orderByChild("owner_or_transporter_id")
+        .equalTo(transporterUid)
+        .once("value", vehicleInfo => {
+          const vehicleObj = vehicleInfo.val();
+          for (let vKey in vehicleObj) {
+            count  = count + vehicleObj[vKey].occupied_seats
+          }
+          this.transporters[index].no_child = count
         });
     }
   }

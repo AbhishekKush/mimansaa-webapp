@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <v-app id="inspire">
+      <v-app id="inspire" >
     <!-- <img src="./assets/logo.png"> -->
     <!-- <v-content> 
       <v-container fluid  >  -->

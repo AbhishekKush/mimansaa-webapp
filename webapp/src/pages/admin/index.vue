@@ -4,7 +4,7 @@
     <menu-left :drawer.sync="drawer"/>
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="blue darken-3" dark app fixed>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-side-icon @click=" toggleDrawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">Mimansaa</span>
       </v-toolbar-title>
       <v-autocomplete
@@ -68,7 +68,6 @@ export default {
   },
   data() {
     return {
-      drawer: true,
       loading:false,
       items: [],
       states: [
@@ -146,7 +145,9 @@ export default {
     }
   },
    computed: {
-
+     drawer(){
+        return this.$store.getters.drawer
+     },
     isLoading(){
       return this.$store.getters.loading
     }
@@ -164,7 +165,11 @@ export default {
     },
     logout() {
       this.$store.dispatch("userSignOut");
-    }
+    },
+    toggleDrawer(){
+    this.$store.dispatch('toggleDrawer',this.drawer)
   }
+  }
+  
 };
 </script>

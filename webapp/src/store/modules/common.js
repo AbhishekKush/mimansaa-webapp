@@ -1,11 +1,15 @@
 export default {
 
     state: {
-        loading:false
+        loading:false,
+        drawer:true,
     },
     getters: {
         loading: state => {
             return state.loading
+        },
+        drawer: state => {
+            return state.drawer
         }
     },
     mutations: {
@@ -16,6 +20,9 @@ export default {
     actions: {
         setMainLoading({ commit }, payload) {
             commit('setLoading', payload);
+        },
+        toggleDrawer({ commit, state},payload){
+            state.drawer = !payload
         }
 
     }

@@ -12,7 +12,7 @@ exports.createWUser = functions.https.onCall((data) => {
 	const email = data.email;
 	const password = data.password;
 	const displayName = data.name
-	const phone = "+91" + data.phone
+	const phone = data.phone
 
 	return admin.auth().createUser({
 		email: email,
@@ -69,3 +69,16 @@ exports.updateWUser = functions.https.onCall((data) => {
 		})
 });
 // [END updateWUser]
+
+// [ Start deleteWUser]
+exports.deleteWUser = functions.https.onCall((uid) => {
+	console.log(uid)
+	admin.auth().deleteUser(uid)
+	.then(function() {
+	  console.log('Successfully deleted user');
+	})
+	.catch(function(error) {
+		throw new functions.https.HttpsError('unknown', error.message, error);
+	})
+});
+// [END deleteWUser]

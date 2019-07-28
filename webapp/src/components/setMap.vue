@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h3>Search and add a pin</h3>
+      <h3 class="subheading">Search and add a pin</h3>
       <label>
         <gmap-autocomplete
           @place_changed="setPlace"

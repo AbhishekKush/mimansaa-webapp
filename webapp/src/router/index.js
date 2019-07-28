@@ -108,6 +108,15 @@ export default new Router({
               }
             },
             {
+              path: 'EditTransporter/:id',
+              name: 'EditTransporter',
+              props:true,
+              component: () => import('@/pages/admin/transporter/EditTransporter'),
+              meta:{
+                requiresAuth:true
+              }
+            },
+            {
               path: 'AddTransporter',
               name: 'AddTransporter',
               component: () => import('@/pages/admin/transporter/AddTransporter'),
